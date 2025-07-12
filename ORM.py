@@ -57,7 +57,7 @@ def create_tables(engine):
 
 def create_database(dbname, user, password, host='localhost', port=5432):
     try:
-        # Подключаемся к системной базе данных
+     
         sys_engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/postgres")
         
         with sys_engine.connect() as conn:
@@ -122,15 +122,15 @@ def get_sales_by_publisher(session):
     publisher_input = input("\nВведите имя или ID издателя: ")
     
     try:
-        # Пытаемся преобразовать ввод в число (для ID)
+
         publisher_id = int(publisher_input)
         condition = Publisher.id == publisher_id
     except ValueError:
-        # Если не число - используем поиск по имени
+
         condition = Publisher.name.ilike(f"%{publisher_input}%")
     
     try:
-        # Выполняем запрос
+
         query = session.query(
                 Book.title,
                 Shop.name.label("shop_name"),
@@ -149,7 +149,7 @@ def get_sales_by_publisher(session):
             print("Данные не найдены")
             return
         
-        # Выводим результаты
+
         print("\nРезультаты:")
         print(f"{'Название книги':<30} | {'Магазин':<10} | {'Сумма':<8} | {'Дата'}")
         print("-" * 65)
@@ -161,10 +161,10 @@ def get_sales_by_publisher(session):
         print(f"Ошибка при выполнении запроса: {e}")
 
 def main():
-    # Получаем параметры подключения
+
     params = get_connection_params()
     
-    # Пытаемся создать базу данных, если её нет
+
     create_database(
         dbname=params['dbname'],
         user=params['user'],
@@ -173,31 +173,29 @@ def main():
         port=params['port']
     )
     
-    # Формируем DSN
+
     DSN = f"postgresql://{params['user']}:{params['password']}@{params['host']}:{params['port']}/{params['dbname']}"
     
     try:
         engine = create_engine(DSN)
         print(f"\nПодключаемся к базе данных: {params['dbname']}...")
-        
-        # Проверяем соединение
+
         with engine.connect() as conn:
             print("Соединение с PostgreSQL установлено успешно!")
         
-        # Создаём таблицы
+
         if not create_tables(engine):
             print("Не удалось создать таблицы. Проверьте настройки подключения.")
             return
         
-        # Создаём сессию
         Session = sessionmaker(bind=engine)
         session = Session()
         
-        # Предлагаем добавить тестовые данные
+
         if input("\nДобавить тестовые данные? (y/n): ").lower() == 'y':
             insert_test_data(session)
         
-        # Основной цикл запросов
+
         while True:
             get_sales_by_publisher(session)
             if input("\nВыполнить ещё один запрос? (y/n): ").lower() != 'y':
