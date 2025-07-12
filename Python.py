@@ -123,7 +123,7 @@ def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
         cur.execute(query, params)
         return cur.fetchall()
 
-# Пример использования
+
 with psycopg2.connect(database="Anna", user="postgres", password="Mingwei11") as conn:
     create_db(conn)
     
